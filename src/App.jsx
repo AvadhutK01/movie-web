@@ -1,19 +1,27 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 
 function App() {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [isRetrying, setIsRetrying] = useState(false)
+  const retryTimeoutRef = useRef(null)
 
   useEffect(() => {
     fetchMovies()
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current)
+      }
+    }
   }, [])
 
   const fetchMovies = async () => {
     try {
       setLoading(true)
-      const response = await fetch('https://swapi.info/api/films')
+      // Simulating error with invalid URL as requested
+      const response = await fetch('https://swapi.info/api/films_invalid')
       if (!response.ok) {
         throw new Error('Failed to fetch movies')
       }
@@ -21,11 +29,24 @@ function App() {
       const sortedMovies = data.sort((a, b) => a.episode_id - b.episode_id)
       setMovies(sortedMovies)
       setError(null)
+      setIsRetrying(false)
     } catch (err) {
-      setError(err.message)
+      setError('Something went wrong ....Retrying')
+      setIsRetrying(true)
+      retryTimeoutRef.current = setTimeout(() => {
+        fetchMovies()
+      }, 5000)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleCancelRetry = () => {
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current)
+    }
+    setIsRetrying(false)
+    setError('Something went wrong')
   }
 
   const formatDate = (dateString) => {
@@ -53,7 +74,15 @@ function App() {
         <div className="error-container">
           <h2>⚠️ Error</h2>
           <p>{error}</p>
-          <button onClick={fetchMovies} className="retry-btn">Retry</button>
+          {isRetrying ? (
+            <button onClick={handleCancelRetry} className="retry-btn" style={{ backgroundColor: '#ff4444' }}>
+              Cancel Retry
+            </button>
+          ) : (
+            <button onClick={fetchMovies} className="retry-btn">
+              Retry
+            </button>
+          )}
         </div>
       </div>
     )
@@ -80,7 +109,7 @@ function App() {
                 <div className="episode-badge">Episode {movie.episode_id}</div>
                 <h2 className="movie-title">{movie.title}</h2>
               </div>
-              
+
               <div className="movie-info">
                 <div className="info-row">
                   <span className="info-label">Director</span>
