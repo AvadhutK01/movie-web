@@ -1,6 +1,6 @@
 import { useState, memo } from 'react';
 
-const MovieForm = memo(() => {
+const MovieForm = memo(({ onMovieAdded }) => {
     const [formData, setFormData] = useState({
         title: '',
         episode_id: '',
@@ -9,6 +9,7 @@ const MovieForm = memo(() => {
         release_date: '',
         opening_crawl: '',
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -18,18 +19,53 @@ const MovieForm = memo(() => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('NewMovieObj:', formData);
-        // Reset form for premium UX
-        setFormData({
-            title: '',
-            episode_id: '',
-            director: '',
-            producer: '',
-            release_date: '',
-            opening_crawl: '',
-        });
+
+        setIsSubmitting(true);
+        try {
+            const firestoreData = {
+                fields: {
+                    title: { stringValue: formData.title },
+                    episode_id: { integerValue: parseInt(formData.episode_id) },
+                    director: { stringValue: formData.director },
+                    producer: { stringValue: formData.producer },
+                    release_date: { stringValue: formData.release_date },
+                    opening_crawl: { stringValue: formData.opening_crawl }
+                }
+            };
+
+            const response = await fetch(
+                'https://firestore.googleapis.com/v1/projects/sh-p-f50d3/databases/(default)/documents/movies',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(firestoreData),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to add movie to Firestore');
+            }
+            setFormData({
+                title: '',
+                episode_id: '',
+                director: '',
+                producer: '',
+                release_date: '',
+                opening_crawl: '',
+            });
+
+            if (onMovieAdded) {
+                onMovieAdded();
+            }
+        } catch (error) {
+            alert('Failed to add movie. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -110,8 +146,8 @@ const MovieForm = memo(() => {
                             ></textarea>
                         </div>
                     </div>
-                    <button type="submit" className="submit-btn">
-                        Add Movie
+                    <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                        {isSubmitting ? 'Adding...' : 'Add Movie'}
                     </button>
                 </form>
             </div>

@@ -21,13 +21,32 @@ function App() {
   const fetchMovies = async () => {
     try {
       setLoading(true)
-      // Simulating error with invalid URL as requested
-      const response = await fetch('https://swapi.info/api/films')
+      const response = await fetch('https://firestore.googleapis.com/v1/projects/sh-p-f50d3/databases/(default)/documents/movies')
       if (!response.ok) {
         throw new Error('Failed to fetch movies')
       }
       const data = await response.json()
-      const sortedMovies = data.sort((a, b) => a.episode_id - b.episode_id)
+
+      const mappedMovies = (data.documents || []).map(doc => {
+        const f = doc.fields
+        return {
+          id: doc.name.split('/').pop(),
+          url: doc.name,
+          title: f.title?.stringValue || 'Unknown Title',
+          episode_id: f.episode_id?.integerValue || f.episode_id?.stringValue || '?',
+          director: f.director?.stringValue || 'Unknown',
+          producer: f.producer?.stringValue || 'Unknown',
+          release_date: f.release_date?.stringValue || '',
+          opening_crawl: f.opening_crawl?.stringValue || '',
+        }
+      })
+
+      const sortedMovies = mappedMovies.sort((a, b) => {
+        const idA = parseInt(a.episode_id) || 0
+        const idB = parseInt(b.episode_id) || 0
+        return idA - idB
+      })
+
       setMovies(sortedMovies)
       setError(null)
       setIsRetrying(false)
@@ -103,7 +122,7 @@ function App() {
       </header>
 
       <main className="main-content">
-        <MovieForm />
+        <MovieForm onMovieAdded={fetchMovies} />
         <div className="movies-grid">
           {movies.map((movie) => (
             <article key={movie.url} className="movie-card">
@@ -129,25 +148,6 @@ function App() {
 
               <div className="opening-crawl">
                 <p>{movie.opening_crawl}</p>
-              </div>
-
-              <div className="movie-stats">
-                <div className="stat">
-                  <span className="stat-number">{movie.characters.length}</span>
-                  <span className="stat-label">Characters</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-number">{movie.planets.length}</span>
-                  <span className="stat-label">Planets</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-number">{movie.starships.length}</span>
-                  <span className="stat-label">Starships</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-number">{movie.species.length}</span>
-                  <span className="stat-label">Species</span>
-                </div>
               </div>
             </article>
           ))}
