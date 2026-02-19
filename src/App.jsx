@@ -21,7 +21,7 @@ function App() {
     try {
       setLoading(true)
       // Simulating error with invalid URL as requested
-      const response = await fetch('https://swapi.info/api/films_invalid')
+      const response = await fetch('https://swapi.info/api/films')
       if (!response.ok) {
         throw new Error('Failed to fetch movies')
       }
