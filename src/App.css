@@ -80,6 +80,101 @@
   padding: 3rem 1.5rem;
 }
 
+/* Movie Form Section */
+.movie-form-section {
+  max-width: 900px;
+  margin: 0 auto 4rem auto;
+}
+
+.form-container {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  backdrop-filter: blur(15px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  padding: 2.5rem;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+}
+
+.form-container h2 {
+  font-size: 1.8rem;
+  color: #ffd700;
+  margin-bottom: 2rem;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.input-group.full-width {
+  grid-column: span 2;
+}
+
+.input-group label {
+  font-size: 0.9rem;
+  color: #b8c5d6;
+  font-weight: 500;
+  margin-left: 0.5rem;
+}
+
+.input-group input,
+.input-group textarea {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.input-group textarea {
+  resize: vertical;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+  border-color: #ffd700;
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
+}
+
+.submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #0a0e27;
+  border: none;
+  padding: 1.1rem;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(255, 215, 0, 0.4);
+}
+
+.submit-btn:active {
+  transform: translateY(-1px);
+}
+
 /* Movies Grid */
 .movies-grid {
   display: grid;
@@ -378,6 +473,14 @@
 
   .movie-stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .input-group.full-width {
+    grid-column: span 1;
   }
 
   .header {

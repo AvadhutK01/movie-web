@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import MovieForm from './components/MovieForm'
 import './App.css'
 
 function App() {
@@ -102,6 +103,7 @@ function App() {
       </header>
 
       <main className="main-content">
+        <MovieForm />
         <div className="movies-grid">
           {movies.map((movie) => (
             <article key={movie.url} className="movie-card">
